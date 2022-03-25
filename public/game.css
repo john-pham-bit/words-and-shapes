@@ -1,0 +1,625 @@
+:root {
+  --tooltip-time: 2s;
+  --tooltip-color: #ff4500;
+  --card-font-size: 2rem;
+  --draw-card-anim-time: 0.3s;
+  --card-back-color: #b4783c;
+  --card-front-color: rgb(230, 230, 230);
+}
+
+body {
+  cursor: none;
+  overflow-y: hidden;
+}
+
+.button {
+  cursor: none;
+}
+
+label {
+  cursor: none;
+  user-select: none;
+}
+
+input[type="range"] {
+  width: 90%;
+  margin-right: 20px;
+  background-image: linear-gradient(#ff4500, #ff4500);
+  cursor: none;
+}
+
+input[type="number"] {
+  width: 3rem;
+  height: 2rem;
+  cursor: none;
+  -moz-appearance: textfield;
+  background: var(--input-highlighted-color);
+  font-weight: bolder;
+  border-style: none;
+  border-bottom-style: solid;
+  border-radius: 5px;
+  padding-left: 5px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="checkbox"] {
+  width: var(--sub-element-font-size);
+  height: var(--sub-element-font-size);
+  margin-left: 20px;
+  cursor: none;
+}
+
+.game-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.game-viewport {
+  width: 100vw;
+  height: 100vh;
+}
+
+@media (min-width: 500px) {
+  .game-viewport {
+    width: 80vw;
+    height: 80vh;
+  }
+}
+
+#pre-game-lobby {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.game-settings-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  height: 75%;
+  background-color: var(--input-color);
+  box-shadow: inset 0px 0px 5px var(--bg-color);
+  border-radius: 2rem;
+}
+
+.setting-section {
+  width: 90%;
+  margin-top: 0.5rem;
+  padding: 10px 20px;
+}
+
+.setting-section label {
+  font-size: var(--sub-element-font-size);
+  color: black;
+}
+
+.input-container {
+  display: flex;
+  width: 100%;
+}
+
+.player-list {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 25%;
+  overflow-y: hidden;
+  overflow-y: visible;
+}
+
+.player-avatar {
+  position: absolute;
+  height: 100%;
+  max-height: 200px;
+  transition: transform 0.75s ease-out;
+  width: 150px;
+  overflow-x: visible;
+  transform: translateX(25vw) translateY(200%);
+}
+
+.player-avatar-elements {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow-x: visible;
+  animation: 20s ease-in-out var(--anim-delay, 0s) infinite floating;
+}
+
+@keyframes floating {
+  0% {
+    transform: translate(0px, 0px);
+  }
+  20% {
+    transform: translate(-7px, -7px);
+  }
+  40% {
+    transform: translate(5px, 6px);
+  }
+  60% {
+    transform: translate(7px, -4px);
+  }
+  80% {
+    transform: translate(-6px, 4px);
+  }
+  100% {
+    transform: translate(0px, 0px);
+  }
+}
+
+.canvas-container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  margin-top: var(--small-element-font-size);
+}
+
+.player-avatar.local .canvas-container::before {
+  box-sizing: border-box;
+  position: absolute;
+  content: "";
+  width: 7rem;
+  height: 7rem;
+  background-color: var(--element-color);
+  border-radius: 50%;
+  opacity: 0.75;
+  box-shadow: inset 0px 0px 20px 20px var(--bg-color);
+  z-index: -1;
+  background-clip: content-box;
+  padding: 1px;
+  animation: 2s ease-in-out 0s infinite alternate glow;
+}
+
+@keyframes glow {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.5);
+  }
+}
+
+.player-name-container {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: auto;
+}
+
+.player-name-label {
+  text-align: center;
+  width: 100%;
+  font-size: var(--small-element-font-size);
+  transition: transform 1s, color 1s;
+  transform: scale(1);
+  color: black;
+  user-select: none;
+}
+
+/* These pseudo-elements center the label */
+.player-name-label::before {
+  content: "";
+  margin-left: -100%;
+}
+.player-name-label::after {
+  content: "";
+  font-size: 1rem;
+  margin-right: -100%;
+}
+
+.player-avatar.local .player-name-label::after {
+  content: "✏️";
+}
+
+.player-name-label.updated {
+  transform: scale(2);
+  color: yellow;
+  transition: none;
+}
+
+#name-input {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  font-size: var(--small-element-font-size);
+}
+
+.invite-link-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.invite-link-label {
+  position: relative;
+  top: 10px;
+  font-size: var(--small-element-font-size);
+  padding: 0;
+  width: 85%;
+}
+
+.link {
+  width: 65%;
+  font-family: 'Courier New', monospace;
+  font-weight: bolder;
+  animation: none;
+  font-size: 1rem;
+  word-wrap: break-word;
+}
+
+#invite-link {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+
+#invite-link::before,
+#invite-link::after {
+  --arrow-size: 10px;
+
+  position: absolute;
+  transform: translateY(var(--translate-y, 0));
+  opacity: 0;
+  transform-origin: top;
+  pointer-events: none;
+}
+
+#invite-link::before {
+  --translate-y: calc(100% + var(--arrow-size));
+
+  content: "Copied!";
+  padding: .5rem 2rem;
+  font-size: 2.2rem;
+  width: max-content;
+  max-width: 100%;
+  height: 100%;
+  text-align: center;
+  border-radius: .7rem;
+  background-color: var(--tooltip-color);
+}
+
+#invite-link::after {
+  --translate-y: calc(var(--arrow-size) + 1px);
+
+  content: "";
+  height: 100%;
+  border: var(--arrow-size) solid transparent;
+  border-bottom-color: var(--tooltip-color);
+}
+
+#invite-link.tooltip-appear::before, 
+#invite-link.tooltip-appear::after {
+  animation: var(--tooltip-time, 2s) linear 0s tooltip;
+}
+
+@keyframes tooltip {
+  0% {
+    opacity: 1;
+    transform: translateY(var(--translate-y, 0)) scale(1.25);
+  }
+  5% {
+    opacity: 1;
+    transform: translateY(var(--translate-y, 0)) scale(1);
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+#start-button {
+  position: absolute;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.mouse-avatar {
+  --mouse-position-x: 0;
+  --mouse-position-y: 0;
+  --mouse-avatar-transition-time: 0;
+
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  transform: translateX(var(--mouse-position-x)) translateY(var(--mouse-position-y));
+  transition: transform var(--mouse-avatar-transition-time) linear;
+}
+
+.mouse-avatar.local {
+  transition: none;
+  z-index: 50;
+}
+
+#game {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.deck,
+.card-pile,
+.drawn-card,
+.wildcard-draw-location {
+  width: 20%;
+  height: 35%;
+}
+
+.deck,
+.card-pile,
+.drawn-card,
+.card-back,
+.card,
+.wildcard {
+  border-radius: 10px;
+}
+
+.deck,
+.card-back,
+.card,
+.wildcard {
+  border: 2px solid black;
+}
+
+.drawn-card {
+  --drawn-card-start-pos-x: 0;
+  --drawn-card-start-pos-y: 0;
+  --drawn-card-end-pos-x: 0;
+  --drawn-card-end-pos-y: 0;
+  --final-opacity: 1;
+  
+  position: absolute;
+  top: 0;
+  z-index: 20;
+  animation: var(--draw-card-anim-time) linear move-card;
+}
+
+.card-back {
+  width: 100%;
+  height: 100%;
+  background: var(--card-back-color);
+}
+
+.drawn-card-sub {
+  width: 100%;
+  height: 100%;
+  animation: var(--draw-card-anim-time) linear flip-card;
+  perspective: 2rem;
+}
+
+@keyframes move-card {
+  0% {
+    transform: translate(var(--drawn-card-start-pos-x), var(--drawn-card-start-pos-y));
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--drawn-card-end-pos-x), var(--drawn-card-end-pos-y));
+    opacity: var(--final-opacity);
+  }
+}
+
+@keyframes flip-card {
+  0% {
+    transform: rotateX(0) rotateY(0);
+  }
+  100% {
+    transform: rotateX(-180deg) rotateY(-180deg);
+  }
+}
+
+.card,
+.deck {
+  --card-position-x: 0;
+  --card-position-y: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 10px 5px rgba(0, 0, 0, 0.2);
+  background-color: var(--card-front-color);
+  transform: translateX(var(--card-position-x)) translateY(var(--card-position-y));
+  user-select: none;
+}
+
+.deck {
+  --deck-position-x: 0;
+
+  background-color: var(--card-back-color);
+  transform: translateX(var(--deck-position-x));
+  z-index: 15;
+}
+
+.deck.deck-disabled {
+  opacity: 0;
+}
+
+.deck-label {
+  transform: rotate(-25deg);
+  color: rgb(220, 220, 220);
+}
+
+.card {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.drawn-card-sub .card {
+  box-shadow: none;
+}
+
+.card-contents {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 98%;
+  height: 98%;
+}
+
+.card-shape {
+  width: 30%;
+  height: 30%;
+}
+
+.card-contents::before,
+.card-contents::after {
+  content: attr(data-word);
+  word-wrap: break-word;
+  position: absolute;
+  top: 0;
+  font-size: var(--card-font-size);
+  font-weight: bolder;
+  width: 100%;
+  text-align: center;
+  text-shadow: 0px 0px 5px rgba(0, 0, 0, 1);
+}
+
+.card-contents::after {
+  bottom: 0;
+  transform: rotate(0.5turn);
+}
+
+.card-pile {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  top: 0;
+  width: 20%;
+  height: 35%;
+  transition: transform 1s;
+}
+
+.card-pile .player-avatar-container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 35%;
+  transform: translateY(-80%) scale(0.75);
+}
+
+.card-pile .player-avatar-container .player-avatar {
+  position: static;
+  height: 100%;
+  max-height: 200px;
+  transition: none;
+  width: 100%;
+  overflow-x: visible;
+  transform: scale(0.1);
+}
+
+.wildcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: var(--card-front-color);
+  z-index: 200;
+}
+
+.wildcard .card-shape.top-shape,
+.deck .card-shape.top-shape {
+  position: absolute;
+  top: 0;
+}
+
+.wildcard .card-shape.bottom-shape,
+.deck .card-shape.bottom-shape {
+  position: absolute;
+  bottom: 0;
+}
+
+.wildcard-draw-location {
+  --deck-position-x: 0;
+  
+  transform: translateX(var(--deck-position-x));
+}
+
+.wildcard-draw-location .wildcard {
+  /* Flip the card since that's what the flip-card animation does */
+  transform: rotate(180deg);
+}
+
+.wildcard-draw-location .wildcard.back-to-deck {
+  animation: var(--draw-card-anim-time) linear forwards slide-to-deck;
+}
+
+@keyframes slide-to-deck {
+  0% {
+    transform: translateY(0) rotate(180deg);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100%) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+.score {
+  width: 100%;
+  height: 100%;
+  z-index: 200;
+  text-align: center;
+  user-select: none;
+}
+
+.invalid-game-page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+#room-id {
+  font-family: 'Courier New', monospace;
+  font-weight: bolder;
+  color: white;
+}
