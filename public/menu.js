@@ -172,8 +172,22 @@ function onLoad() {
   const wordArray = [];
 
   wordInput.addEventListener("input", (e) => {
-    checkIfWordInputHasValue();
+    let inputExists = checkIfWordInputHasValue();
+    unhideAllWords();
+    if (inputExists) {
+      wordListContainer.querySelectorAll(".word-item").forEach((wordItem) => {
+        if (!wordItem.dataset.word.includes(wordInput.value.toLowerCase())) {
+          wordItem.classList.add("hidden");
+        }
+      });
+    }
   });
+
+  function unhideAllWords() {
+    wordListContainer.querySelectorAll(".word-item").forEach((wordItem) => {
+      wordItem.classList.remove("hidden");
+    });
+  }
 
   wordInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
@@ -187,6 +201,8 @@ function onLoad() {
 
   function submitNewWord() {
     if (submitBtn.classList.contains("disabled")) { return; }
+
+    unhideAllWords();
 
     // Delay by 100ms so mobile keyboard has a chance to get off the screen
     setTimeout(async () => {
@@ -213,8 +229,10 @@ function onLoad() {
   function checkIfWordInputHasValue() {
     if (wordInput.value != "") {
       submitBtn.classList.remove("disabled");
+      return true;
     } else {
       submitBtn.classList.add("disabled");
+      return false;
     }
   }
 
@@ -291,6 +309,7 @@ function onLoad() {
       wordItem.classList.add("pending");
     }
     wordItem.dataset.wordId = word_id;
+    wordItem.dataset.word = word.toLowerCase();
     wordListContainer.append(wordItem);
 
     // Add Delete event listener
