@@ -36,6 +36,12 @@ function onLoad() {
     },
     stealCard: function(otherPlayerId) {
       socket.emit("stealCard", { playerId: otherPlayerId });
+    },
+    scoreGame: function() {
+      socket.emit("scoreGame");
+    },
+    playAgain: function() {
+      socket.emit("playAgain");
     }
   };
 
@@ -422,33 +428,69 @@ function onLoad() {
     return drawCardAnimTime;
   }
 
+  let endGameButtons = document.querySelector(".end-game-button-container");
+  let scoreGameBtn = document.querySelector("#score-game-btn");
+  let playAgainBtn = document.querySelector("#play-again-btn");
+
   socket.on("outOfWords", (event) => outOfWords(event));
   function outOfWords(event) {
     let deck = document.querySelector(".deck");
     deck.classList.add("deck-disabled");
 
-    let drawCardAnimTime = getDrawCardAnimTime();
-    setTimeout(() => {
-      document.querySelectorAll(".card").forEach((card) => {
-        card.remove();
-      });
+    endGameButtons.classList.remove("hidden");
+    scoreGameBtn.classList.remove("hidden");
+    playAgainBtn.classList.add("hidden");
+  }
 
-      event.scoreboard.forEach((scoreRow) => {
-        let scoreDisplay = document.createElement("div");
-        scoreDisplay.classList.add("score");
-        scoreDisplay.innerHTML = "Score: " + scoreRow.score;
-        getCardPile(scoreRow.playerId).append(scoreDisplay);
-      });
-    }, drawCardAnimTime * 1.5);
+  scoreGameBtn.addEventListener("click", () => {
+    if (scoreGameBtn.classList.contains("hidden")) { return; }
+
+    IO.scoreGame();
+  });
+
+  playAgainBtn.addEventListener("click", () => {
+    if (playAgainBtn.classList.contains("hidden")) { return; }
+    
+    IO.playAgain();
+  });
+
+  socket.on("scoreboard", (event) => scoreboard(event));
+  function scoreboard(event) {
+    scoreGameBtn.classList.add("hidden");
+    playAgainBtn.classList.remove("hidden");
+
+    deleteAllcards();
+
+    event.scoreboard.forEach((scoreRow) => {
+      let scoreDisplay = document.createElement("div");
+      scoreDisplay.classList.add("score");
+      scoreDisplay.innerHTML = "Score: " + scoreRow.score;
+      getCardPile(scoreRow.playerId).append(scoreDisplay);
+    });
   }
 
   socket.on("resetGame", (event) => resetGame(event));
   function resetGame(event) {
+    endGameButtons.classList.add("hidden");
+    scoreGameBtn.classList.add("hidden");
+    playAgainBtn.classList.add("hidden");
+
+    deleteAllcards();
+
     let deck = document.querySelector(".deck");
     deck.classList.remove("deck-disabled");
     removeCardShapesFromDeck();
     document.querySelectorAll(".score").forEach((scoreDisplay) => {
       scoreDisplay.remove();
+    });
+  }
+
+  function deleteAllcards() {
+    document.querySelectorAll(".card").forEach((card) => {
+      card.remove();
+    });
+    document.querySelectorAll(".drawn-card").forEach((card) => {
+      card.remove();
     });
   }
 

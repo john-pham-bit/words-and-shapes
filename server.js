@@ -65,6 +65,8 @@ function bindEvents(socket) {
   socket.on("moveCardPile", (event) => moveCardPile(socket, event));
   socket.on("drawCard", () => drawCard(socket));
   socket.on("stealCard", (event) => stealCard(socket, event))
+  socket.on("scoreGame", () => scoreGame(socket))
+  socket.on("playAgain", () => playAgain(socket))
 }
 
 function onDisconnecting(socket) {
@@ -321,16 +323,7 @@ function drawCard(socket) {
   }
 
   if (roomIdToWordList.get(roomId).length <= 0) {
-    let playerScores = [];
-    getRoomPlayerSockets(roomId).forEach((socket) => {
-      playerScores.push({ playerId: socket.playerId, score: socket.playerScore });
-    });
-    io.to(roomId).emit("outOfWords", { scoreboard: playerScores });
-
-    // Reset the game after 10 seconds
-    setTimeout(() => {
-      resetGame(roomId);
-    }, 10000);
+    io.to(roomId).emit("outOfWords");
   }
 }
 
@@ -349,6 +342,24 @@ function stealCard(socket, event) {
   socket.playerScore++;
 
   io.to(roomId).emit("stealCard", { thief: socket.playerId, victim: event.playerId, word: cardToSteal.word, shape: cardToSteal.shape });
+}
+
+function scoreGame(socket) {
+  let roomId = getRoomId(socket);
+  if (roomIdToWordList.get(roomId).length > 0) { return; }
+
+  let playerScores = [];
+  getRoomPlayerSockets(roomId).forEach((socket) => {
+    playerScores.push({ playerId: socket.playerId, score: socket.playerScore });
+  });
+  io.to(roomId).emit("scoreboard", { scoreboard: playerScores });
+}
+
+function playAgain(socket) {
+  let roomId = getRoomId(socket);
+  if (roomIdToWordList.get(roomId).length > 0) { return; }
+
+  resetGame(roomId);
 }
 
 function resetGame(roomId) {

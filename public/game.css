@@ -565,13 +565,13 @@ input[type="checkbox"] {
 .wildcard .card-shape.top-shape,
 .deck .card-shape.top-shape {
   position: absolute;
-  top: 0;
+  top: 5%;
 }
 
 .wildcard .card-shape.bottom-shape,
 .deck .card-shape.bottom-shape {
   position: absolute;
-  bottom: 0;
+  bottom: 5%;
 }
 
 .wildcard-draw-location {
@@ -622,4 +622,30 @@ input[type="checkbox"] {
   font-family: 'Courier New', monospace;
   font-weight: bolder;
   color: white;
+}
+
+.end-game-button-container {
+  position: absolute;  
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.end-game-button-container-sub {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%
+}
+
+.button.end-game {
+  position: absolute;
+  top: 20%;
+  width: 80%;
+  z-index: 1000;
+}
+
+#play-again-btn {
+  top: 80%;
 }
