@@ -174,16 +174,54 @@ function onLoad() {
 
 //#region Game
 
+  let playerIdToCards;
+
   socket.on("startGame", () => startGame());
   function startGame() {
     setTimeout(() => {
       allowClick = true;
-    }, 1000);
+    }, 500);
 
     let game = document.querySelector("#game");
     document.querySelector("#pre-game-lobby").classList.add("hidden");
     game.classList.remove("hidden");
     centerDeck();
+
+    initPlayerCards();
+  }
+
+  function initPlayerCards() {
+    playerIdToCards = new Map();
+    getPlayerAvatars().forEach((avatar) => {
+      playerIdToCards.set(avatar.dataset.playerId, []);
+    });
+  }
+
+  function addPlayerCard(playerId, word, shape) {
+    let currentCards = playerIdToCards.get(playerId);
+    currentCards.push({ word: word, shape: shape });
+    playerIdToCards.set(playerId, currentCards);
+  }
+
+  function removePlayerCard(playerId, word) {
+    let currentCards = playerIdToCards.get(playerId);
+    let mostRecentCard = currentCards.pop();
+
+    if (mostRecentCard.word != word) {
+      currentCards.push(mostRecentCard);
+
+      let wordIndex = -1;
+      for (let i = 0; i < currentCards.length; ++i) {
+        if (currentCards[i].word == word) {
+          wordIndex = i;
+          break;
+        }
+      }
+      if (wordIndex == -1) { return; }
+      currentCards.splice(wordIndex, 1);
+    }
+
+    playerIdToCards.set(playerId, currentCards);
   }
 
   socket.on("cardPile", (event) => addCardPile(event));
@@ -290,8 +328,17 @@ function onLoad() {
     let thiefPile = getCardPile(event.thief);
     let victimPile = getCardPile(event.victim);
 
-    let cardToSteal = victimPile.querySelector(`.card[data-word="${event.word}"]`);
-    if (cardToSteal == null) { return; }
+    victimPile.querySelectorAll(".card").forEach((existingCard) => {
+      existingCard.remove();
+    });
+
+    let cardToSteal = constructCard(event.word, event.shape);
+    removePlayerCard(event.victim, event.word);
+
+    if (event.nextWord != null) {
+      let nextCard = constructCard(event.nextWord, event.nextShape);
+      victimPile.append(nextCard);
+    }
 
     animateCardFlip(cardToSteal, victimPile, thiefPile, true);
   }
@@ -321,22 +368,29 @@ function onLoad() {
     let deck = document.querySelector(".deck");
     let cardPile = getCardPile(event.playerId);
 
-    // Construct the card
+    let card = constructCard(event.word, event.shape);
+
+    animateCardFlip(card, deck, cardPile);
+
+    addPlayerCard(event.playerId, event.word, event.shape);
+  }
+
+  function constructCard(word, shape) {
     let card = document.createElement("div");
     card.classList.add("card");
-    card.dataset.word = event.word;
+    card.dataset.word = word;
 
     let cardContents = document.createElement("div");
     cardContents.classList.add("card-contents");
-    cardContents.dataset.word = event.word;
+    cardContents.dataset.word = word;
     card.append(cardContents);
 
     let cardShape = document.createElement("img");
     cardShape.classList.add("card-shape");
-    cardShape.src = getShapeImage(event.shape);
+    cardShape.src = getShapeImage(shape);
     cardContents.append(cardShape);
 
-    animateCardFlip(card, deck, cardPile);
+    return card;
   }
 
   function animateCardFlip(card, start, end, steal = false) {
@@ -378,6 +432,9 @@ function onLoad() {
       if (steal) {
         postFlip.remove();
       } else {
+        end.querySelectorAll(".card").forEach((existingCard) => {
+          existingCard.remove();
+        })
         end.append(postFlip);
       }
       drawnCard.remove();
@@ -476,6 +533,8 @@ function onLoad() {
     playAgainBtn.classList.add("hidden");
 
     deleteAllcards();
+
+    initPlayerCards();
 
     let deck = document.querySelector(".deck");
     deck.classList.remove("deck-disabled");

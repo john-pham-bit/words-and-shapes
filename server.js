@@ -339,9 +339,15 @@ function stealCard(socket, event) {
 
   let cardToSteal = socketToStealFrom.currentCards.pop();
 
+  let nextCard = socketToStealFrom.currentCards.pop();
+  socketToStealFrom.currentCards.push(nextCard);
+
   socket.playerScore++;
 
-  io.to(roomId).emit("stealCard", { thief: socket.playerId, victim: event.playerId, word: cardToSteal.word, shape: cardToSteal.shape });
+  io.to(roomId).emit("stealCard", { thief: socket.playerId, victim: event.playerId, 
+    word: cardToSteal.word, shape: cardToSteal.shape, 
+    nextWord: nextCard == null ? null : nextCard.word, 
+    nextShape: nextCard == null ? null : nextCard.shape });
 }
 
 function scoreGame(socket) {
