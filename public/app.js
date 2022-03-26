@@ -435,7 +435,11 @@ function onLoad() {
         end.querySelectorAll(".card").forEach((existingCard) => {
           existingCard.remove();
         })
-        end.append(postFlip);
+
+        // Do not append if scores are already displayed
+        if (document.querySelector(".score") == null) {
+          end.append(postFlip);
+        }
       }
       drawnCard.remove();
     }, drawCardAnimTime);
