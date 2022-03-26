@@ -114,6 +114,7 @@ function joinRoom_internal(socket, roomId) {
   socket.emit("roomId", { roomId: roomId });
   notifyUpdatedPlayerList(roomId);
   notifyWordCount(roomId);
+  notifySettings(roomId);
 }
 
 async function assignRoomWordList(roomId) {
@@ -135,6 +136,7 @@ function cleanUpRoom(roomId) {
   if (!roomExists(roomId)) {
     roomIdToWordList.delete(roomId);
     roomIdToBaseWordList.delete(roomId);
+    roomIdToSettings.delete(roomId);
     removeElement(gamesInProgress, roomId);
   }
 }
@@ -174,7 +176,17 @@ function syncSettings(socket, event) {
     shapeCount: clamp(event.shapeCount, minShapeCount, maxShapeCount),
     wildcards: event.wildcards ? true : false
   }
-  io.to(roomId).emit("settings", newSettings);
+
+  roomIdToSettings.set(roomId, newSettings);
+
+  notifySettings(roomId);
+}
+
+function notifySettings(roomId) {
+  let settings = roomIdToSettings.get(roomId);
+  if (settings != null) {
+    io.to(roomId).emit("settings", settings);
+  }
 }
 
 function clamp(value, min, max) {
